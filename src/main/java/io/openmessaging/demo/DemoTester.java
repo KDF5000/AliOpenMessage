@@ -19,7 +19,7 @@ public class DemoTester {
         //实际测试时利用 STORE_PATH 传入存储路径
         //所有producer和consumer的STORE_PATH都是一样的，选手可以自由在该路径下创建文件
          */
-        properties.put("STORE_PATH", "/home/admin/test");
+        properties.put("STORE_PATH", "/Users/KDF5000/Documents/2017/Coding/Middleware/data");
 
         //这个测试程序的测试逻辑与实际评测相似，但注意这里是单线程的，实际测试时会是多线程的，并且发送完之后会Kill进程，再起消费逻辑
 
@@ -84,7 +84,6 @@ public class DemoTester {
             long endConsumer = System.currentTimeMillis();
             long T2 = endConsumer - startConsumer;
             System.out.println(String.format("Team1 cost:%d ms tps:%d q/ms", T2 + T1, (queue1Offset + topic1Offset)/(T1 + T2)));
-
         }
 
         //消费样例2，实际测试时会Kill掉发送进程，另取进程进行消费
