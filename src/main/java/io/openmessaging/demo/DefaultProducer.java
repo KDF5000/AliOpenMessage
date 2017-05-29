@@ -14,6 +14,7 @@ public class DefaultProducer  implements Producer {
     }
 
     @Override public void flush(){
+        System.out.println("[KDF5000] begin to flush!");
         this.messageStore.startFlushDisk(properties.getString("STORE_PATH"));
     }
     @Override public BytesMessage createBytesMessageToTopic(String topic, byte[] body) {

@@ -129,8 +129,6 @@ public class DemoTester {
 //            System.out.println("Producer Time:%s"+T1);
 //        }
 
-
-
         //启动10个消费者去消费
         {
             ArrayList<String> topics1 = new ArrayList<String>();

@@ -19,7 +19,11 @@ class MessageFlush implements Runnable{
     }
     @Override public void run(){
         try{
+            int count = 0;
             while(true){
+                if(queue.isEmpty()){
+                    break;
+                }
                 Message message = queue.take();
                 String topic = message.headers().getString(MessageHeader.TOPIC);
                 String queue = message.headers().getString(MessageHeader.QUEUE);
@@ -41,6 +45,10 @@ class MessageFlush implements Runnable{
                     mmapFile.putMessage(message);
                 }catch (IOException e){
                     e.printStackTrace();
+                }
+                count++;
+                if(count%1000000==0){
+                    System.out.println("[KDF5000] count:"+count);
                 }
             }
         }catch (InterruptedException e){
