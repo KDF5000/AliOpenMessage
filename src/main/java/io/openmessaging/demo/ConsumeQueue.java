@@ -3,7 +3,7 @@ package io.openmessaging.demo;
 import io.openmessaging.KeyValue;
 import io.openmessaging.Message;
 import io.openmessaging.MessageHeader;
-import io.openmessaging.doriginalemo.DefaultKeyValue;
+import io.openmessaging.originalemo.DefaultKeyValue;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package io.openmessaging.doriginalemo;
+package io.openmessaging.originalemo;
 
 import io.openmessaging.KeyValue;
 import io.openmessaging.Message;
