@@ -10,7 +10,7 @@ public class DefaultProducer  implements Producer {
 
     public DefaultProducer(KeyValue properties) {
         this.properties = properties;
-//        this.messageStore.startFlushDisk(properties.getString("STORE_PATH"));
+        this.messageStore.startFlushDisk(properties.getString("STORE_PATH"));
     }
 
     @Override public void flush(){

@@ -21,7 +21,7 @@ class MessageFlush implements Runnable{
         try{
             int count = 0;
             while(true){
-                if(queue.isEmpty()){
+                if(queue.isEmpty() && count>0){
                     break;
                 }
                 Message message = queue.take();
@@ -37,7 +37,6 @@ class MessageFlush implements Runnable{
                 if(mmapFileMap.containsKey(type+bucket)){
                     mmapFile = mmapFileMap.get(type+bucket);
                 }else{
-
                     mmapFile = new MappedFile(this.storePath,bucket,type);
                     mmapFileMap.put(type+bucket,mmapFile);
                 }
@@ -59,7 +58,7 @@ class MessageFlush implements Runnable{
 
 
 public class MessageStore {
-    private static int MESSAGE_QUEUE_LEN = 40000000;
+    private static int MESSAGE_QUEUE_LEN = 400000;
 
     private static final MessageStore INSTANCE = new MessageStore();
 

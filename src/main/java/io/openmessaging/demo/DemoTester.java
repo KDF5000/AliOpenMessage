@@ -122,7 +122,7 @@ public class DemoTester {
 //                executorService.execute(new ProducerTester(properties,topics));
 //            }
 //
-//            Thread.sleep(2000);
+////            Thread.sleep(2000);
 //            executorService.shutdown();
 //            long end = System.currentTimeMillis();
 //            long T1 = end - start;
