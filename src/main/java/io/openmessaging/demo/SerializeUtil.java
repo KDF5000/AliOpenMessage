@@ -1,10 +1,9 @@
-package io.messaging.demo;
+package io.openmessaging.demo;
 
 import io.openmessaging.KeyValue;
 import io.openmessaging.Message;
 import io.openmessaging.MessageHeader;
 import io.openmessaging.Producer;
-import io.openmessaging.demo.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

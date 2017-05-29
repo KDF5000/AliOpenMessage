@@ -1,6 +1,4 @@
-package io.messaging.demo;
-
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
+package io.openmessaging.demo;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

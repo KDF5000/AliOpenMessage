@@ -1,4 +1,4 @@
-package io.messaging.demo;
+package io.openmessaging.demo;
 
 import io.openmessaging.Message;
 

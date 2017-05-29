@@ -1,4 +1,4 @@
-package io.messaging.demo;
+package io.openmessaging.doriginalemo;
 
 import io.openmessaging.BytesMessage;
 import io.openmessaging.MessageFactory;

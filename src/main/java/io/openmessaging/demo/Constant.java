@@ -1,4 +1,4 @@
-package io.messaging.demo;
+package io.openmessaging.demo;
 
 /**
  * Created by KDF5000 on 2017/5/29.

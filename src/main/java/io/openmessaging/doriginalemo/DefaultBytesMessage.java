@@ -1,12 +1,10 @@
-package io.messaging.demo;
+package io.openmessaging.doriginalemo;
 
 import io.openmessaging.BytesMessage;
 import io.openmessaging.KeyValue;
 import io.openmessaging.Message;
 
-import java.io.Serializable;
-
-public class DefaultBytesMessage implements BytesMessage,Serializable{
+public class DefaultBytesMessage implements BytesMessage {
 
     private KeyValue headers = new DefaultKeyValue();
     private KeyValue properties;

@@ -1,11 +1,9 @@
-package io.messaging.demo;
+package io.openmessaging.demo;
 
-import com.sun.tools.internal.jxc.ap.Const;
 import io.openmessaging.KeyValue;
 import io.openmessaging.Message;
 import io.openmessaging.MessageHeader;
-import io.openmessaging.demo.*;
-import io.openmessaging.demo.DefaultKeyValue;
+import io.openmessaging.doriginalemo.DefaultKeyValue;
 
 import java.util.ArrayList;
 import java.util.HashMap;

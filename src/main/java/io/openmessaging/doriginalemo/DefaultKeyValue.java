@@ -1,13 +1,11 @@
-package io.messaging.demo;
+package io.openmessaging.doriginalemo;
 
 import io.openmessaging.KeyValue;
-
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class DefaultKeyValue implements KeyValue,Serializable {
+public class DefaultKeyValue implements KeyValue {
 
     private final Map<String, Object> kvs = new HashMap<>();
     @Override

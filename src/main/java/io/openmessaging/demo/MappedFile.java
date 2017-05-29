@@ -1,8 +1,7 @@
-package io.messaging.demo;
+package io.openmessaging.demo;
 
 import io.openmessaging.Message;
 import io.openmessaging.MessageHeader;
-import io.openmessaging.demo.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;

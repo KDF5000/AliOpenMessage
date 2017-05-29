@@ -1,13 +1,16 @@
-package io.messaging.demo;
+package io.openmessaging.doriginalemo;
 
-import io.openmessaging.*;
-import org.junit.Assert;
-
+import io.openmessaging.KeyValue;
+import io.openmessaging.Message;
+import io.openmessaging.MessageHeader;
+import io.openmessaging.Producer;
+import io.openmessaging.PullConsumer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.junit.Assert;
 
-public class DemoTester_bak {
+public class DemoTester {
 
 
     public static void main(String[] args) {
@@ -120,5 +123,7 @@ public class DemoTester_bak {
             long T2 = endConsumer - startConsumer;
             System.out.println(String.format("Team2 cost:%d ms tps:%d q/ms", T2 + T1, (queue2Offset + topic1Offset)/(T1 + T2)));
         }
+
+
     }
 }

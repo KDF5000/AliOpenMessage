@@ -1,7 +1,5 @@
 package io.openmessaging.demo;
 
-import io.openmessaging.exception.OMSException;
-import io.openmessaging.exception.OMSResourceNotExistException;
 import io.openmessaging.exception.OMSRuntimeException;
 
 public class ClientOMSException extends OMSRuntimeException {

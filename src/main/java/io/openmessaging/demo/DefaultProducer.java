@@ -1,13 +1,6 @@
 package io.openmessaging.demo;
 
-import io.openmessaging.BatchToPartition;
-import io.openmessaging.BytesMessage;
-import io.openmessaging.KeyValue;
-import io.openmessaging.Message;
-import io.openmessaging.MessageFactory;
-import io.openmessaging.MessageHeader;
-import io.openmessaging.Producer;
-import io.openmessaging.Promise;
+import io.openmessaging.*;
 
 public class DefaultProducer  implements Producer {
     private MessageFactory messageFactory = new DefaultMessageFactory();
@@ -17,6 +10,7 @@ public class DefaultProducer  implements Producer {
 
     public DefaultProducer(KeyValue properties) {
         this.properties = properties;
+        this.messageStore.startFlushDisk(properties.getString("STORE_PATH"));
     }
 
 

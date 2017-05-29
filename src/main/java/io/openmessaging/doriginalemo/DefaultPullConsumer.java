@@ -1,18 +1,20 @@
-package io.messaging.demo;
+package io.openmessaging.doriginalemo;
 
 import io.openmessaging.KeyValue;
 import io.openmessaging.Message;
 import io.openmessaging.PullConsumer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import java.util.*;
 public class DefaultPullConsumer implements PullConsumer {
     private MessageStore messageStore = MessageStore.getInstance();
     private KeyValue properties;
     private String queue;
     private Set<String> buckets = new HashSet<>();
     private List<String> bucketList = new ArrayList<>();
-
-    private ConsumeQueue consumeQueue;
 
     private int lastIndex = 0;
 
@@ -25,30 +27,19 @@ public class DefaultPullConsumer implements PullConsumer {
         return properties;
     }
 
-//    @Override public synchronized Message poll() {
-//        if (buckets.size() == 0 || queue == null) {
-//            return null;
-//        }
-//        //use Round Robin
-//        int checkNum = 0;
-//        while (++checkNum <= bucketList.size()) {
-//            String bucket = bucketList.get((++lastIndex) % (bucketList.size()));
-//            Message message = messageStore.pullMessage(queue, bucket);
-//            if (message != null) {
-//                return message;
-//            }
-//        }
-//        return null;
-//    }
 
-    @Override
-    public Message poll() {
+    @Override public synchronized Message poll() {
         if (buckets.size() == 0 || queue == null) {
             return null;
         }
-        Message msg = consumeQueue.pollMessage();
-        if(msg != null){
-            return msg;
+        //use Round Robin
+        int checkNum = 0;
+        while (++checkNum <= bucketList.size()) {
+            String bucket = bucketList.get((++lastIndex) % (bucketList.size()));
+            Message message = messageStore.pullMessage(queue, bucket);
+            if (message != null) {
+                return message;
+            }
         }
         return null;
     }
@@ -66,15 +57,15 @@ public class DefaultPullConsumer implements PullConsumer {
     }
 
     @Override public synchronized void attachQueue(String queueName, Collection<String> topics) {
-        if (queue != null && !queue.equals(queueName) || consumeQueue!=null) {
+        if (queue != null && !queue.equals(queueName)) {
             throw new ClientOMSException("You have alreadly attached to a queue " + queue);
         }
         queue = queueName;
         buckets.add(queueName);
-        buckets.addAll(topics); //这样的效果是并没有区分queue和topic,但是queuename将作为queue的标识
+        buckets.addAll(topics);
         bucketList.clear();
         bucketList.addAll(buckets);
-        consumeQueue = new ConsumeQueue(queueName, bucketList,properties);
     }
+
 
 }
