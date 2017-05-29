@@ -3,10 +3,7 @@ package io.openmessaging.demo;
 import io.openmessaging.Message;
 import io.openmessaging.MessageHeader;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
@@ -128,6 +125,9 @@ public class MappedFile {
         if(msg != null){
             return msg;
         }
+
+
+
         return null;
     }
 

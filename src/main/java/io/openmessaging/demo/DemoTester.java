@@ -35,6 +35,7 @@ class ProducerTester implements Runnable{
 
     @Override
     public void run() {
+        int count=0;
         while (true){
             int topicIndex = random.nextInt(topics.size());
             Topic topic = topics.get(topicIndex);
@@ -50,7 +51,12 @@ class ProducerTester implements Runnable{
             if(msg != null){
                 producer.send(msg);
             }
+            count++;
+            if(count>200000){
+                break;
+            }
         }
+        producer.flush();
     }
 }
 

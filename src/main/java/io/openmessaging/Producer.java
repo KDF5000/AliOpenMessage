@@ -128,4 +128,7 @@ public interface Producer extends MessageFactory, ServiceLifecycle {
     BatchToPartition createBatchToPartition(String partitionName);
 
     BatchToPartition createBatchToPartition(String partitionName, KeyValue properties);
+
+    //落盘
+    void flush();
 }

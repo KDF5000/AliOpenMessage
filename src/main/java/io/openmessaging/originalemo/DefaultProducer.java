@@ -35,7 +35,7 @@ public class DefaultProducer  implements Producer {
     @Override public void shutdown() {
 
     }
-
+    @Override public void flush(){}
     @Override public KeyValue properties() {
         return properties;
     }

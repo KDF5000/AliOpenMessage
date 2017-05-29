@@ -51,7 +51,7 @@ class MessageFlush implements Runnable{
 
 
 public class MessageStore {
-    private static int MESSAGE_QUEUE_LEN = 100000;
+    private static int MESSAGE_QUEUE_LEN = 40000000;
 
     private static final MessageStore INSTANCE = new MessageStore();
 
@@ -109,8 +109,8 @@ public class MessageStore {
         try{
             Message msg = mmapFile.getMessage(offset);
             return msg;
-        }catch (IOException e){
-            e.printStackTrace();
+        }catch (Exception e){
+//            e.printStackTrace();
         }
         return null;
     }
