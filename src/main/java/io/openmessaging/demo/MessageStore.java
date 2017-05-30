@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 
 class MessageFlush implements Runnable{
     private ArrayBlockingQueue<Message> queue;
@@ -58,7 +59,7 @@ class MessageFlush implements Runnable{
 
 
 public class MessageStore {
-    private static int MESSAGE_QUEUE_LEN = 400000;
+    private static int MESSAGE_QUEUE_LEN = 1000000;
 
     private static final MessageStore INSTANCE = new MessageStore();
 
@@ -90,13 +91,13 @@ public class MessageStore {
         flushThread.start();
         isFlushing=true;
     }
-
-    public synchronized void putMessage(String bucket, Message message) {
-        if (!messageBuckets.containsKey(bucket)) {
-            messageBuckets.put(bucket, new ArrayList<>(1024));
-        }
-        ArrayList<Message> bucketList = messageBuckets.get(bucket);
-        bucketList.add(message);
+    //synchronized
+    public void putMessage(String bucket, Message message) {
+//        if (!messageBuckets.containsKey(bucket)) {
+//            messageBuckets.put(bucket, new ArrayList<>(1024));
+//        }
+//        ArrayList<Message> bucketList = messageBuckets.get(bucket);
+//        bucketList.add(message);
         //放入队列，等待异步落盘
         try{
             queue.put(message);
@@ -105,7 +106,7 @@ public class MessageStore {
         }
     }
     //synchronized
-    public  Message pullMessage(String bucket,int type, long offset,String storePath){
+    public synchronized Message pullMessage(String bucket,int type, long offset,String storePath){
         MappedFile mmapFile = null;
         if(mmapFileMap.containsKey(type+bucket)){
             mmapFile = mmapFileMap.get(type+bucket);

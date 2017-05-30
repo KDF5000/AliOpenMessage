@@ -52,7 +52,7 @@ class ProducerTester implements Runnable{
                 producer.send(msg);
             }
             count++;
-            if(count>200000){
+            if(count>10000){
                 break;
             }
         }
@@ -122,8 +122,8 @@ public class DemoTester {
 //                executorService.execute(new ProducerTester(properties,topics));
 //            }
 //
-////            Thread.sleep(2000);
 //            executorService.shutdown();
+//            executorService.awaitTermination(2L, TimeUnit.SECONDS);
 //            long end = System.currentTimeMillis();
 //            long T1 = end - start;
 //            System.out.println("Producer Time:%s"+T1);
@@ -147,6 +147,5 @@ public class DemoTester {
             executorService2.shutdown();
             executorService2.awaitTermination(10L, TimeUnit.SECONDS);
         }
-
     }
 }
