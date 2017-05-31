@@ -18,6 +18,4 @@ public class ClientOMSException extends OMSRuntimeException {
         return message;
     }
 
-
-
 }

@@ -1,5 +1,6 @@
 package io.openmessaging.demo;
 
+import javax.jws.soap.SOAPBinding;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -106,7 +107,18 @@ public class MmapDemo{
 
     }
     public static void main(String []args) throws  IOException{
-        write();
-        read();
+//        write();
+//        read();
+        String a = "TOPIC1";
+        String b = "TOPIC2";
+        String c = "TOPIC3";
+        String q = "QUEUE_1";
+        String q2 = "QUEUE_2";
+
+        System.out.println(a.hashCode()%10);
+        System.out.println(b.hashCode()%10);
+        System.out.println(c.hashCode()%10);
+        System.out.println(q.hashCode()%10);
+        System.out.println(q2.hashCode()%10);
     }
 }

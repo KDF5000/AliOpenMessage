@@ -28,7 +28,6 @@ public class ConsumeQueue {
         this.storePath = properties.getString("STORE_PATH");
     }
 
-
     public Message pollMessage(){
         if(queueName == null || bucketList==null || bucketList.size() == 0){
             return null;

@@ -22,9 +22,9 @@ class MessageFlush implements Runnable{
         try{
             int count = 0;
             while(true){
-                if(queue.isEmpty() && count>0){
-                    break;
-                }
+//                if(queue.isEmpty() && count>0){
+//                    break;
+//                }
                 Message message = queue.take();
                 String topic = message.headers().getString(MessageHeader.TOPIC);
                 String queue = message.headers().getString(MessageHeader.QUEUE);
@@ -59,8 +59,8 @@ class MessageFlush implements Runnable{
 
 
 public class MessageStore {
-    private static int MESSAGE_QUEUE_LEN = 40000000;
-
+    private static int MESSAGE_QUEUE_LEN = 8000000;
+    private static int QUEUE_NUM = 5;
     private static final MessageStore INSTANCE = new MessageStore();
 
     public static MessageStore getInstance() {
@@ -72,11 +72,17 @@ public class MessageStore {
     private Map<String, HashMap<String, Integer>> queueOffsets = new HashMap<>();
 
     private ArrayBlockingQueue<Message> queue = new ArrayBlockingQueue<Message>(MESSAGE_QUEUE_LEN);
+    //多个队列
+    private ArrayBlockingQueue<Message>[] queues = new ArrayBlockingQueue[QUEUE_NUM];
+
     private HashMap<String, MappedFile> mmapFileMap = new HashMap<String,MappedFile>();
     private boolean isFlushing = false;
 
     public MessageStore(){
         //启动刷新消息线程
+        for(int i=0;i<QUEUE_NUM;i++){
+            queues[i] = new ArrayBlockingQueue<Message>(MESSAGE_QUEUE_LEN);
+        }
     }
 
 
@@ -87,8 +93,10 @@ public class MessageStore {
         if(storePath==null){
             storePath = Constant.STORE_PATH;
         }
-        Thread flushThread = new Thread(new MessageFlush(queue,storePath));
-        flushThread.start();
+        for (int i=0;i<QUEUE_NUM;i++){
+            Thread flushThread = new Thread(new MessageFlush(queues[i],storePath));
+            flushThread.start();
+        }
         isFlushing=true;
     }
     //synchronized
@@ -99,8 +107,10 @@ public class MessageStore {
 //        ArrayList<Message> bucketList = messageBuckets.get(bucket);
 //        bucketList.add(message);
         //放入队列，等待异步落盘
+
         try{
-            queue.put(message);
+//            queue.put(message);
+            queues[Math.abs(bucket.hashCode())%QUEUE_NUM].put(message);
         }catch (InterruptedException e){
             e.printStackTrace();
         }
