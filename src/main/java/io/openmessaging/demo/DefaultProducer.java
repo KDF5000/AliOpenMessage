@@ -3,6 +3,7 @@ package io.openmessaging.demo;
 import io.openmessaging.*;
 
 public class DefaultProducer  implements Producer {
+
     private MessageFactory messageFactory = new DefaultMessageFactory();
     private MessageStore messageStore = MessageStore.getInstance();
 
@@ -44,7 +45,7 @@ public class DefaultProducer  implements Producer {
         if ((topic == null && queue == null) || (topic != null && queue != null)) {
             throw new ClientOMSException(String.format("Queue:%s Topic:%s should put one and only one", true, queue));
         }
-
+//        System.out.println("[KDF5000] send a message!");
         messageStore.putMessage(topic != null ? topic : queue, message);
     }
 

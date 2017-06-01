@@ -22,9 +22,10 @@ class MessageFlush implements Runnable{
         try{
             int count = 0;
             while(true){
-//                if(queue.isEmpty() && count>0){
-//                    break;
-//                }
+                if(queue.isEmpty() && count>0){
+                    System.out.println("[KDF5000] Flush finished!");
+                    break;
+                }
                 Message message = queue.take();
                 String topic = message.headers().getString(MessageHeader.TOPIC);
                 String queue = message.headers().getString(MessageHeader.QUEUE);
@@ -59,7 +60,7 @@ class MessageFlush implements Runnable{
 
 
 public class MessageStore {
-    private static int MESSAGE_QUEUE_LEN = 8000000;
+    private static int MESSAGE_QUEUE_LEN = 800000;
     private static int QUEUE_NUM = 5;
     private static final MessageStore INSTANCE = new MessageStore();
 
@@ -84,7 +85,6 @@ public class MessageStore {
             queues[i] = new ArrayBlockingQueue<Message>(MESSAGE_QUEUE_LEN);
         }
     }
-
 
     public void startFlushDisk(String storePath){
         if(isFlushing){
@@ -115,6 +115,7 @@ public class MessageStore {
             e.printStackTrace();
         }
     }
+
     //synchronized
     public synchronized Message pullMessage(String bucket,int type, long offset,String storePath){
         MappedFile mmapFile = null;
