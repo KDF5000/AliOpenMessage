@@ -60,7 +60,7 @@ class MessageFlush implements Runnable{
 
 
 public class MessageStore {
-    private static int MESSAGE_QUEUE_LEN = 800000;
+    private static int MESSAGE_QUEUE_LEN = 1000000;
     private static int QUEUE_NUM = 5;
     private static final MessageStore INSTANCE = new MessageStore();
 

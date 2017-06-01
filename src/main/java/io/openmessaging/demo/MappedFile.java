@@ -11,7 +11,7 @@ import java.nio.channels.FileChannel;
  * Created by KDF5000 on 2017/5/29.
  */
 public class MappedFile {
-    private static final int MEM_BUFFER_SIZE = 32 * 1024 * 1024; //32M
+    private static final int MEM_BUFFER_SIZE = 8 * 1024 * 1024; //32M
     private String indexFilePath;
     private String dataFilePath;
     private String storePath;
