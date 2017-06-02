@@ -14,6 +14,7 @@ public class DefaultProducer  implements Producer {
 
     public DefaultProducer(KeyValue properties) {
         this.properties = properties;
+        //增加计数器
         this.messageStore.producerUp();
         this.messageStore.startFlushDisk(properties.getString("STORE_PATH"));
         this.queues = this.messageStore.getQueues();

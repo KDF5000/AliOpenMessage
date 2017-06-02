@@ -87,7 +87,7 @@ public class MappedFile {
         dataCurrentPostion += 4+msgLen;
     }
 
-    public Message getMessage(long offset) throws IOException{
+    public synchronized Message getMessage(long offset) throws IOException{
         //索引文件没有这么多内容
         if(offset*16 > indexFileChannel.size()){
             return null;
@@ -113,7 +113,7 @@ public class MappedFile {
         int dataStart = new Long(dataOffeset-dataMemStart).intValue();
         int msgLen = dataMem.getInt(dataStart);
 //        System.out.println(msgLen);
-//        System.out.println(bucket+",Len:"+msgLen+",dataStart:"+dataStart);
+        System.out.println(bucket+",Len:"+msgLen+",dataStart:"+dataStart);
         byte []data = new byte[msgLen];
 
         dataMem.get(dataStart);

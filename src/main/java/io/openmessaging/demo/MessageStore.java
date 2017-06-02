@@ -36,7 +36,7 @@ class MessageFlush implements Runnable{
 //              Message message = queue.poll(1, TimeUnit.SECONDS);
                 Message message = queue.poll(10, TimeUnit.MILLISECONDS);
                 if(message==null ){
-                    System.out.println("[KDF5000] take message is null "+producerCounter.intValue());
+//                    System.out.println("[KDF5000] take message is null "+producerCounter.intValue());
                     continue;
                 }
 //                System.out.println(Thread.currentThread().getName()+"take:"+queue.size());
@@ -107,11 +107,11 @@ public class MessageStore {
     }
 
     public void producerUp(){
-        this.poducerCounter.getAndIncrement();
+        this.poducerCounter.incrementAndGet();
     }
 
     public void producerDown(){
-        this.poducerCounter.getAndDecrement();
+        this.poducerCounter.decrementAndGet();
     }
 
     public synchronized void startFlushDisk(String storePath){
@@ -130,12 +130,14 @@ public class MessageStore {
         isFlushing = true;
     }
 
-    public synchronized void waitFlush() throws Exception{
+    public  void waitFlush() throws Exception{
         for(int i=0;i<QUEUE_NUM;i++){
             ts[i].join();
         }
         System.out.println("[KDF5000] All flush threads finished!");
-        isFlushing = false;
+        synchronized (this){
+            isFlushing = false;
+        }
     }
 
     public synchronized boolean getFlushStatus() {
@@ -147,7 +149,7 @@ public class MessageStore {
         return this.queues;
     }
     //synchronized
-    public synchronized void putMessage(String bucket, Message message) {
+    public void putMessage(String bucket, Message message) {
 //        if (!messageBuckets.containsKey(bucket)) {
 //            messageBuckets.put(bucket, new ArrayList<>(1024));
 //        }
@@ -174,6 +176,7 @@ public class MessageStore {
             mmapFile = new MappedFile(storePath,bucket,type);
             mmapFileMap.put(type+bucket,mmapFile);
         }
+
         try{
             Message msg = mmapFile.getMessage(offset);
             return msg;
