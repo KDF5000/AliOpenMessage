@@ -66,9 +66,9 @@ public class MappedFile {
     public void putMessage(Message msg) throws IOException{
         byte[] msgBytes = SerializeUtil.serialize(msg);
         int msgLen = msgBytes.length;
-        if(msgLen>400){
-            System.out.println("[KDF5000] Len:"+msgLen);
-        }
+//        if(msgLen>400){
+//            System.out.println("[KDF5000] Len:"+msgLen);
+//        }
 
         if(!indexMem.hasRemaining()){
             indexMemStart += indexMem.position();
@@ -113,7 +113,7 @@ public class MappedFile {
         int dataStart = new Long(dataOffeset-dataMemStart).intValue();
         int msgLen = dataMem.getInt(dataStart);
 //        System.out.println(msgLen);
-        System.out.println(bucket+",Len:"+msgLen+",dataStart:"+dataStart);
+//        System.out.println(bucket+",Len:"+msgLen+",dataStart:"+dataStart);
         byte []data = new byte[msgLen];
 
         dataMem.get(dataStart);
