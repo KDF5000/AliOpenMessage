@@ -9,26 +9,40 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Condition;
 
 class MessageFlush implements Runnable{
     private ArrayBlockingQueue<Message> queue;
     private HashMap<String, MappedFile> mmapFileMap = new HashMap<String,MappedFile>();
     private String storePath;
+
     public MessageFlush(ArrayBlockingQueue queue,String storePath){
         this.queue = queue;
         this.storePath = storePath;
     }
+
     @Override public void run(){
         try{
             int count = 0;
             while(true){
-                if(queue.isEmpty() && count>0){
-                    System.out.println("[KDF5000] Flush finished!");
+//                if(queue.isEmpty() && count>0){
+//                    System.out.println("[KDF5000] Flush finished!");
+//                    counter.incrementAndGet();
+//                    break;
+//                }
+//                queue.take();
+                Message message = queue.poll(1, TimeUnit.SECONDS);
+                if(message==null && queue.size()==0){
+                    Thread.sleep(1000);
+                    System.out.println("[KDF5000] Flush finished!"+queue.size());
                     break;
                 }
-                Message message = queue.take();
-                String topic = message.headers().getString(MessageHeader.TOPIC);
+//                System.out.println(Thread.currentThread().getName()+"take:"+queue.size());
+//                Message message = queue.take();
                 String queue = message.headers().getString(MessageHeader.QUEUE);
+                String topic = message.headers().getString(MessageHeader.TOPIC);
                 if ((topic == null && queue == null) || (topic != null && queue != null)) {
                     throw new ClientOMSException(String.format("Queue:%s Topic:%s should put one and only one", true, queue));
                 }
@@ -60,9 +74,11 @@ class MessageFlush implements Runnable{
 
 
 public class MessageStore {
-    private static int MESSAGE_QUEUE_LEN = 1000000;
+    private static int MESSAGE_QUEUE_LEN = 100000;
     private static int QUEUE_NUM = 5;
     private static final MessageStore INSTANCE = new MessageStore();
+    Thread[] ts = new Thread[QUEUE_NUM];
+    private static AtomicInteger poducerCounter;//记录producer结束的个数，用于停止落盘线程
 
     public static MessageStore getInstance() {
         return INSTANCE;
@@ -77,6 +93,7 @@ public class MessageStore {
     private ArrayBlockingQueue<Message>[] queues = new ArrayBlockingQueue[QUEUE_NUM];
 
     private HashMap<String, MappedFile> mmapFileMap = new HashMap<String,MappedFile>();
+
     private boolean isFlushing = false;
 
     public MessageStore(){
@@ -86,7 +103,7 @@ public class MessageStore {
         }
     }
 
-    public void startFlushDisk(String storePath){
+    public synchronized void startFlushDisk(String storePath){
         if(isFlushing){
             return;
         }
@@ -94,11 +111,26 @@ public class MessageStore {
             storePath = Constant.STORE_PATH;
         }
         for (int i=0;i<QUEUE_NUM;i++){
-            Thread flushThread = new Thread(new MessageFlush(queues[i],storePath));
-            flushThread.start();
+            ts[i] = new Thread(new MessageFlush(queues[i],storePath));
         }
-        isFlushing=true;
+        for(int i=0;i<QUEUE_NUM;i++){
+            ts[i].start();
+        }
+        isFlushing = true;
     }
+
+    public synchronized void waitFlush() throws Exception{
+        for(int i=0;i<QUEUE_NUM;i++){
+            ts[i].join();
+        }
+        System.out.println("[KDF5000] All flush threads finished!");
+        isFlushing = false;
+    }
+
+    public synchronized boolean getFlushStatus() {
+        return isFlushing;
+    }
+
     //synchronized
     public void putMessage(String bucket, Message message) {
 //        if (!messageBuckets.containsKey(bucket)) {
@@ -111,6 +143,7 @@ public class MessageStore {
         try{
 //            queue.put(message);
             queues[Math.abs(bucket.hashCode())%QUEUE_NUM].put(message);
+//            System.out.println(Math.abs(bucket.hashCode())%QUEUE_NUM + ","+queues[Math.abs(bucket.hashCode())%QUEUE_NUM].size());
         }catch (InterruptedException e){
             e.printStackTrace();
         }

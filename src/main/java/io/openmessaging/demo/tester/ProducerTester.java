@@ -74,8 +74,9 @@ public class ProducerTester {
                     break;
                 }
             }
+            //刷盘
+            producer.flush();
         }
-
     }
 
     public static void main(String[] args) throws Exception {
@@ -91,6 +92,7 @@ public class ProducerTester {
         for (int i = 0; i < ts.length; i++) {
             ts[i].join();
         }
+
         long end = System.currentTimeMillis();
         logger.info("Produce Finished, Cost {} ms", end - start);
     }
