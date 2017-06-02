@@ -36,7 +36,8 @@ public class ConsumeQueue {
         int checkNum = 0;
         while (++checkNum <= bucketList.size()) {
             String bucket = bucketList.get((++lastIndex) % (bucketList.size()));
-            int type = bucket==queueName ? Constant.TYPE_QUEUE : Constant.TYPE_TOPIC;
+            int type = bucket == queueName ? Constant.TYPE_QUEUE : Constant.TYPE_TOPIC;
+            System.out.println(type);
             long offset = 1;
             if (offsetMap.containsKey(bucket)){
                 offset = offsetMap.get(bucket);

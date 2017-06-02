@@ -2,21 +2,27 @@ package io.openmessaging.demo;
 
 import io.openmessaging.*;
 
+import java.util.concurrent.ArrayBlockingQueue;
+
 public class DefaultProducer  implements Producer {
 
     private MessageFactory messageFactory = new DefaultMessageFactory();
     private MessageStore messageStore = MessageStore.getInstance();
-
+    private ArrayBlockingQueue<Message>[] queues;
+    private final static int QUEUE_NUM = 5;
     private KeyValue properties;
 
     public DefaultProducer(KeyValue properties) {
         this.properties = properties;
+        this.messageStore.producerUp();
         this.messageStore.startFlushDisk(properties.getString("STORE_PATH"));
+        this.queues = this.messageStore.getQueues();
     }
 
     @Override public void flush(){
         System.out.println("[KDF5000] begin to flush!");
 //        this.messageStore.startFlushDisk(properties.getString("STORE_PATH"));
+        this.messageStore.producerDown();
         if(this.messageStore.getFlushStatus()){
             try{
                 System.out.println("[KDF5000] wait flush threads finished!");

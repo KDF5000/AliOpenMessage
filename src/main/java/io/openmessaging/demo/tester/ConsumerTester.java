@@ -16,6 +16,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +55,7 @@ public class ConsumerTester {
             } catch (Exception e) {
                 logger.error("please check the package name and class name:", e);
             }
+
             //init offsets
             offsets.put(queue, new HashMap<>());
             for (String topic: topics) {
@@ -94,6 +97,9 @@ public class ConsumerTester {
                         offsets.get(queueOrTopic).put(producer, offset + 1);
                     }
                     pullNum++;
+                    if(pullNum%100000 == 0){
+                        logger.info(Thread.currentThread().getName()+" pull "+pullNum);
+                    }
                 } catch (Exception e) {
                     logger.error("Error occurred in the consuming process", e);
                     break;
@@ -108,18 +114,22 @@ public class ConsumerTester {
     }
 
     public static void main(String[] args) throws Exception {
+        PropertyConfigurator.configure("log4j.properties");
         Thread[] ts = new Thread[Constants.CON_NUM];
         for (int i = 0; i < ts.length; i++) {
             ts[i] = new ConsumerTask(Constants.QUEUE_PRE + i,
                 Collections.singletonList(Constants.TOPIC_PRE + i));
         }
+
         long start = System.currentTimeMillis();
         for (int i = 0; i < ts.length; i++) {
             ts[i].start();
         }
+
         for (int i = 0; i < ts.length; i++) {
             ts[i].join();
         }
+
         int pullNum = 0;
         for (int i = 0; i < ts.length; i++) {
             pullNum += ((ConsumerTask)ts[i]).getPullNum();

@@ -25,6 +25,7 @@ public class ProducerTester {
         Producer producer = null;
         int sendNum = 0;
         Map<String, Integer> offsets = new HashMap<>();
+
         public ProducerTask(String label) {
             this.label = label;
             init();
@@ -75,6 +76,7 @@ public class ProducerTester {
                 }
             }
             //刷盘
+            System.out.println("[KDF5000] producer finished!");
             producer.flush();
         }
     }
