@@ -61,6 +61,7 @@ public class ConsumerTester {
             for (String topic: topics) {
                 offsets.put(topic, new HashMap<>());
             }
+
             for (Map<String, Integer> map: offsets.values()) {
                 for (int i = 0; i < Constants.PRO_NUM; i++) {
                     map.put(Constants.PRO_PRE + i, 0);
@@ -88,10 +89,11 @@ public class ConsumerTester {
                     String body = new String(message.getBody());
                     int index = body.lastIndexOf("_");
                     String producer = body.substring(0, index);
+//                    System.out.println(index+":"+producer)offsets.get(queueOrTopic).get(producer);
                     int offset = Integer.parseInt(body.substring(index + 1));
                     if (offset != offsets.get(queueOrTopic).get(producer)) {
                         logger.error("Offset not equal expected:{} actual:{} producer:{} queueOrTopic:{}",
-                            offsets.get(producer), offset, producer, queueOrTopic);
+                                offsets.get(queueOrTopic).get(producer), offset, producer, queueOrTopic);
                         break;
                     } else {
                         offsets.get(queueOrTopic).put(producer, offset + 1);

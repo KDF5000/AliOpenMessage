@@ -42,26 +42,26 @@ class MessageFlush implements Runnable{
                 }
 //                System.out.println(Thread.currentThread().getName()+"take:"+queue.size());
 //                Message message = queue.take();
-//                String queue = message.headers().getString(MessageHeader.QUEUE);
-//                String topic = message.headers().getString(MessageHeader.TOPIC);
-//                if ((topic == null && queue == null) || (topic != null && queue != null)) {
-//                    throw new ClientOMSException(String.format("Queue:%s Topic:%s should put one and only one", true, queue));
-//                }
-//                String bucket = topic != null ? topic : queue;
-//                int type = topic!=null ? Constant.TYPE_TOPIC : Constant.TYPE_QUEUE;
-//
-//                MappedFile mmapFile = null;
-//                if(mmapFileMap.containsKey(type+bucket)){
-//                    mmapFile = mmapFileMap.get(type+bucket);
-//                }else{
-//                    mmapFile = new MappedFile(this.storePath,bucket,type);
-//                    mmapFileMap.put(type+bucket,mmapFile);
-//                }
-//                try{
-//                    mmapFile.putMessage(message);
-//                }catch (IOException e){
-//                    e.printStackTrace();
-//                }
+                String queue = message.headers().getString(MessageHeader.QUEUE);
+                String topic = message.headers().getString(MessageHeader.TOPIC);
+                if ((topic == null && queue == null) || (topic != null && queue != null)) {
+                    throw new ClientOMSException(String.format("Queue:%s Topic:%s should put one and only one", true, queue));
+                }
+                String bucket = topic != null ? topic : queue;
+                int type = topic!=null ? Constant.TYPE_TOPIC : Constant.TYPE_QUEUE;
+
+                MappedFile mmapFile = null;
+                if(mmapFileMap.containsKey(type+bucket)){
+                    mmapFile = mmapFileMap.get(type+bucket);
+                }else{
+                    mmapFile = new MappedFile(this.storePath,bucket,type);
+                    mmapFileMap.put(type+bucket,mmapFile);
+                }
+                try{
+                    mmapFile.putMessage(message);
+                }catch (IOException e){
+                    e.printStackTrace();
+                }
                 count++;
                 if(count%1000000==0){
                     System.out.println("[KDF5000] count:"+count);
@@ -179,6 +179,7 @@ public class MessageStore {
         }
 
         try{
+//            System.out.println("MmapFileOffset:"+offset);
             Message msg = mmapFile.getMessage(offset);
             return msg;
         }catch (Exception e){

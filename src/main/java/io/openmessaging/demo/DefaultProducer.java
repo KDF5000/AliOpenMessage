@@ -8,8 +8,6 @@ public class DefaultProducer  implements Producer {
 
     private MessageFactory messageFactory = new DefaultMessageFactory();
     private MessageStore messageStore = MessageStore.getInstance();
-    private ArrayBlockingQueue<Message>[] queues;
-    private final static int QUEUE_NUM = 5;
     private KeyValue properties;
 
     public DefaultProducer(KeyValue properties) {
@@ -17,7 +15,6 @@ public class DefaultProducer  implements Producer {
         //增加计数器
         this.messageStore.producerUp();
         this.messageStore.startFlushDisk(properties.getString("STORE_PATH"));
-        this.queues = this.messageStore.getQueues();
     }
 
     @Override public void flush(){

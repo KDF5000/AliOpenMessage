@@ -94,8 +94,9 @@ public class MappedFile {
         }
 //        System.out.println(indexFileChannel.size());
         //在当前indexMem
-        if((offset-1)*16 < indexMemStart || (offset-1)*16 > indexMemStart+MEM_BUFFER_SIZE){
-            indexMem = indexFileChannel.map(FileChannel.MapMode.READ_ONLY, (offset-1)*16,MEM_BUFFER_SIZE);
+        if((offset-1)*16 < indexMemStart || (offset-1)*16 > indexMemStart+MEM_BUFFER_SIZE-16){
+            indexMemStart = (offset-1)*16;
+            indexMem = indexFileChannel.map(FileChannel.MapMode.READ_ONLY, indexMemStart,MEM_BUFFER_SIZE);
         }
 //        System.out.println(indexMemStart);
         Long indexStart = (offset-1)*16 -indexMemStart;
@@ -107,13 +108,15 @@ public class MappedFile {
         long dataOffeset = indexMem.getLong(indexStart.intValue()+8);
 //        System.out.println(dataOffeset);
 
-        if(dataOffeset < dataMemStart || dataOffeset > dataMemStart+MEM_BUFFER_SIZE){
+        if(dataOffeset < dataMemStart || dataOffeset > dataMemStart+2*MEM_BUFFER_SIZE - 4*1024 ){//还剩4k就加载
+            dataMemStart = dataOffeset;
             dataMem = dataFileChannel.map(FileChannel.MapMode.READ_ONLY, dataOffeset, 2* MEM_BUFFER_SIZE);
         }
         int dataStart = new Long(dataOffeset-dataMemStart).intValue();
+//        System.out.println("dataStart:"+dataStart+",datamemSize:"+dataMem.capacity());
         int msgLen = dataMem.getInt(dataStart);
 //        System.out.println(msgLen);
-        System.out.println(bucket+",Len:"+msgLen+",dataStart:"+dataStart);
+//        System.out.println(bucket+"Offset:"+offset+",indexMemStart"+indexMemStart+",Len:"+msgLen+"indexStart:"+indexStart+",dataOffeset:"+dataOffeset+",dataMemStart:"+dataMemStart);
         byte []data = new byte[msgLen];
 
         dataMem.get(dataStart);
@@ -132,11 +135,11 @@ public class MappedFile {
     }
 
     public static void main(String []args) throws IOException{
-        MappedFile mapFile =new MappedFile(Constant.STORE_PATH,"QUEUE2", Constant.TYPE_QUEUE);
+        MappedFile mapFile =new MappedFile(Constant.STORE_PATH,"QUEUE_0", Constant.TYPE_QUEUE);
         for(int i=1;;i++){
             DefaultBytesMessage msg = (DefaultBytesMessage)mapFile.getMessage(i);
             if(msg!=null){
-                System.out.println("Header: "+ msg.headers().getString(MessageHeader.QUEUE) + "Body: "+new String(msg.getBody()));
+                System.out.println("Header: "+ msg.headers().getString(MessageHeader.QUEUE) + ",Body: "+new String(msg.getBody()));
             }else{
                 System.out.println("Total Message: "+i);
                 break;
