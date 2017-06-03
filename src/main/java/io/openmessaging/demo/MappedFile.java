@@ -104,23 +104,23 @@ public class MappedFile {
 
         if(!indexMem.hasRemaining()){
             //先释放改缓冲区
-            unmap(indexMem);
-//            try{
-//                cleanBuffer(indexMem);
-//            }catch (Exception e){
-//                //
-//            }
+//            unmap(indexMem);
+            try{
+                cleanBuffer(indexMem);
+            }catch (Exception e){
+                //
+            }
             indexMemStart += indexMem.position();
             indexMem = indexFileChannel.map(FileChannel.MapMode.READ_WRITE,indexMemStart,MEM_BUFFER_SIZE);
         }
         if(!dataMem.hasRemaining() || (MEM_BUFFER_SIZE*2 - dataMem.position()) < msgLen+4){
             //先释放改缓冲区
-            unmap(dataMem);
-//            try{
-//                cleanBuffer(dataMem);
-//            }catch (Exception e){
-//                //
-//            }
+//            unmap(dataMem);
+            try{
+                cleanBuffer(dataMem);
+            }catch (Exception e){
+                //
+            }
             dataMemStart += dataMem.position();
             dataMem = dataFileChannel.map(FileChannel.MapMode.READ_WRITE,dataMemStart, MEM_BUFFER_SIZE*2);
         }
@@ -141,7 +141,7 @@ public class MappedFile {
 //        System.out.println(indexFileChannel.size());
         //在当前indexMem
         if((offset-1)*16 < indexMemStart || (offset-1)*16 > indexMemStart+MEM_BUFFER_SIZE-16){
-            unmap(indexMem);
+//            unmap(indexMem);
             try{
                 cleanBuffer(indexMem);
             }catch (Exception e){
@@ -161,12 +161,12 @@ public class MappedFile {
 //        System.out.println(dataOffeset);
 
         if(dataOffeset < dataMemStart || dataOffeset > dataMemStart+2*MEM_BUFFER_SIZE - 4*1024 ){//还剩4k就加载
-            unmap(dataMem);
-//            try{
-//                cleanBuffer(dataMem);
-//            }catch (Exception e){
-//                //
-//            }
+//            unmap(dataMem);
+            try{
+                cleanBuffer(dataMem);
+            }catch (Exception e){
+                //
+            }
             dataMemStart = dataOffeset;
             dataMem = dataFileChannel.map(FileChannel.MapMode.READ_ONLY, dataOffeset, 2* MEM_BUFFER_SIZE);
         }
