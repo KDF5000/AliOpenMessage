@@ -31,7 +31,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>io.openmessaging.demo.tester.ConsumerTester</mainClass>
+                            <mainClass>io.openmessaging.demo.tester.ProducerTester</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

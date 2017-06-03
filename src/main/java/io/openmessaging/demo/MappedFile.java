@@ -2,10 +2,14 @@ package io.openmessaging.demo;
 
 import io.openmessaging.Message;
 import io.openmessaging.MessageHeader;
+import sun.nio.ch.FileChannelImpl;
 
 import java.io.*;
+import java.lang.reflect.Method;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 /**
  * Created by KDF5000 on 2017/5/29.
@@ -47,6 +51,34 @@ public class MappedFile {
         }
     }
 
+    public static void cleanBuffer(final Object buffer) throws Exception {
+        AccessController.doPrivileged(new PrivilegedAction<Object>() {
+            public Object run() {
+                try {
+                    Method getCleanerMethod = buffer.getClass().getMethod("cleaner",new Class[0]);
+                    getCleanerMethod.setAccessible(true);
+                    sun.misc.Cleaner cleaner =(sun.misc.Cleaner)getCleanerMethod.invoke(buffer,new Object[0]);
+                    cleaner.clean();
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        });
+    }
+
+    private void unmap(MappedByteBuffer buffer) {
+        try{
+            Method m = FileChannelImpl.class.getDeclaredMethod("unmap",
+                    MappedByteBuffer.class);
+            m.setAccessible(true);
+            m.invoke(FileChannelImpl.class, buffer);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     private void initMappedFile() throws FileNotFoundException,IOException{
         File indexFile = new File(indexFilePath);
         File dataFile = new File(dataFilePath);
@@ -71,10 +103,24 @@ public class MappedFile {
 //        }
 
         if(!indexMem.hasRemaining()){
+            //先释放改缓冲区
+            unmap(indexMem);
+//            try{
+//                cleanBuffer(indexMem);
+//            }catch (Exception e){
+//                //
+//            }
             indexMemStart += indexMem.position();
             indexMem = indexFileChannel.map(FileChannel.MapMode.READ_WRITE,indexMemStart,MEM_BUFFER_SIZE);
         }
         if(!dataMem.hasRemaining() || (MEM_BUFFER_SIZE*2 - dataMem.position()) < msgLen+4){
+            //先释放改缓冲区
+            unmap(dataMem);
+//            try{
+//                cleanBuffer(dataMem);
+//            }catch (Exception e){
+//                //
+//            }
             dataMemStart += dataMem.position();
             dataMem = dataFileChannel.map(FileChannel.MapMode.READ_WRITE,dataMemStart, MEM_BUFFER_SIZE*2);
         }
@@ -95,6 +141,12 @@ public class MappedFile {
 //        System.out.println(indexFileChannel.size());
         //在当前indexMem
         if((offset-1)*16 < indexMemStart || (offset-1)*16 > indexMemStart+MEM_BUFFER_SIZE-16){
+            unmap(indexMem);
+            try{
+                cleanBuffer(indexMem);
+            }catch (Exception e){
+                //
+            }
             indexMemStart = (offset-1)*16;
             indexMem = indexFileChannel.map(FileChannel.MapMode.READ_ONLY, indexMemStart,MEM_BUFFER_SIZE);
         }
@@ -109,6 +161,12 @@ public class MappedFile {
 //        System.out.println(dataOffeset);
 
         if(dataOffeset < dataMemStart || dataOffeset > dataMemStart+2*MEM_BUFFER_SIZE - 4*1024 ){//还剩4k就加载
+            unmap(dataMem);
+//            try{
+//                cleanBuffer(dataMem);
+//            }catch (Exception e){
+//                //
+//            }
             dataMemStart = dataOffeset;
             dataMem = dataFileChannel.map(FileChannel.MapMode.READ_ONLY, dataOffeset, 2* MEM_BUFFER_SIZE);
         }
@@ -133,6 +191,7 @@ public class MappedFile {
 
         return null;
     }
+
 
     public static void main(String []args) throws IOException{
         MappedFile mapFile =new MappedFile(Constant.STORE_PATH,"QUEUE_0", Constant.TYPE_QUEUE);
