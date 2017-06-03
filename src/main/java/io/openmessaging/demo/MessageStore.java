@@ -63,9 +63,9 @@ class MessageFlush implements Runnable{
                     e.printStackTrace();
                 }
                 count++;
-                if(count%200000==0){
-                    System.out.println("[KDF5000] count:"+count);
-                }
+//                if(count%200000==0){
+//                    System.out.println("[KDF5000] count:"+count);
+//                }
             }
         }catch (InterruptedException e){
             e.printStackTrace();

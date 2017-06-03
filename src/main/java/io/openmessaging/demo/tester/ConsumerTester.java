@@ -99,9 +99,9 @@ public class ConsumerTester {
                         offsets.get(queueOrTopic).put(producer, offset + 1);
                     }
                     pullNum++;
-                    if(pullNum%100000 == 0){
-                        logger.info(Thread.currentThread().getName()+" pull "+pullNum);
-                    }
+//                    if(pullNum%100000 == 0){
+//                        logger.info(Thread.currentThread().getName()+" pull "+pullNum);
+//                    }
                 } catch (Exception e) {
                     logger.error("Error occurred in the consuming process", e);
                     break;
