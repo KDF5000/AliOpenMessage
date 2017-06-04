@@ -15,7 +15,7 @@ import java.security.PrivilegedAction;
  * Created by KDF5000 on 2017/5/29.
  */
 public class MappedFile {
-    private static final int MEM_BUFFER_SIZE = 8 * 1024 * 1024; //8M
+    private static final int MEM_BUFFER_SIZE = 4 * 1024 * 1024; //8M
     private String indexFilePath;
     private String dataFilePath;
     private String storePath;
@@ -105,7 +105,7 @@ public class MappedFile {
 //        }
 
         if(!indexMem.hasRemaining()){
-//            indexMem.force();
+            indexMem.force();
             //先释放改缓冲区
 //            unmap(indexMem);
             try{
@@ -117,7 +117,7 @@ public class MappedFile {
             indexMem = indexFileChannel.map(FileChannel.MapMode.READ_WRITE,indexMemStart,MEM_BUFFER_SIZE);
         }
         if(!dataMem.hasRemaining() || (MEM_BUFFER_SIZE*2 - dataMem.position()) < msgLen+4){
-//            dataMem.force();
+            dataMem.force();
             //先释放改缓冲区
 //            unmap(dataMem);
             try{
