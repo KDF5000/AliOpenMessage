@@ -63,9 +63,9 @@ class MessageFlush implements Runnable{
                     e.printStackTrace();
                 }
                 count++;
-                if(count%1000000==0){
-                    System.out.println("[KDF5000] count:"+count);
-                }
+//                if(count%1000000==0){
+//                    System.out.println("[KDF5000] count:"+count);
+//                }
             }
         }catch (InterruptedException e){
             e.printStackTrace();
@@ -155,12 +155,14 @@ public class MessageStore {
     public void putMessage(String bucket, Message message) {
         try{
 //            queue.put(message);
-            if(topicToQueue.containsKey(bucket)){
-                queues[topicToQueue.get(bucket)].put(message);
-            }else{
-                topicToQueue.put(bucket, nextQueueIndex);
-                queues[nextQueueIndex].put(message);
-                nextQueueIndex = (nextQueueIndex+1)%QUEUE_NUM;
+            synchronized (this){
+                if(topicToQueue.containsKey(bucket)){
+                    queues[topicToQueue.get(bucket)].put(message);
+                }else{
+                    topicToQueue.put(bucket, nextQueueIndex);
+                    queues[nextQueueIndex].put(message);
+                    nextQueueIndex = (nextQueueIndex+1)%QUEUE_NUM;
+                }
             }
 //            queues[Math.abs(bucket.hashCode())%QUEUE_NUM].put(message);
 //            System.out.println("[KDF5000]Put message " + ++pubMessageCount);

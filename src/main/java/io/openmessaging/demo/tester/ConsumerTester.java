@@ -99,7 +99,7 @@ public class ConsumerTester {
                         offsets.get(queueOrTopic).put(producer, offset + 1);
                     }
                     pullNum++;
-                    if(pullNum%100000 == 0){
+                    if(pullNum%2000000 == 0){
                         logger.info(Thread.currentThread().getName()+" pull "+pullNum);
                     }
                 } catch (Exception e) {
