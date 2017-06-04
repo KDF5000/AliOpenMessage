@@ -134,6 +134,8 @@ public class MappedFile {
         //放置4+message个字节
         dataMem.putInt(msgLen);
         dataMem.put(msgBytes);
+        //flush
+//        indexMem.force();dataMem.force();
         dataCurrentPostion += 4+msgLen;
     }
 
