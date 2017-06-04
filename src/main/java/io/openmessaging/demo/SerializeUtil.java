@@ -1,9 +1,13 @@
 package io.openmessaging.demo;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 import io.openmessaging.KeyValue;
 import io.openmessaging.Message;
 import io.openmessaging.MessageHeader;
 import io.openmessaging.Producer;
+import sun.misc.resources.Messages_sv;
 
 import java.io.*;
 
@@ -64,6 +68,157 @@ public class SerializeUtil {
         baos.write(body);
         return baos.toByteArray();
     }
+    //总长度 + KeyLen + Key + ValueLen + Value + ...
+    public static byte[] serializeKeyValue(KeyValue kv){
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayOutputStream realData = new ByteArrayOutputStream();
+        if (kv==null){
+            try{
+                baos.write(intToByte(0));
+                return baos.toByteArray();
+            }catch (IOException e){
+                //
+            }
+            return null;
+        }
+        int totalLen = 0;
+        for(String key:kv.keySet()){
+            try{
+                Object val = kv.getObject(key);
+                ByteArrayOutputStream tmpByteArray = new ByteArrayOutputStream();
+                ObjectOutputStream oos = new ObjectOutputStream(tmpByteArray);
+                oos.writeObject(val);
+
+                realData.write(intToByte(key.getBytes().length));
+                realData.write(key.getBytes());
+
+                byte[] tmpByte = tmpByteArray.toByteArray();
+                realData.write(intToByte(tmpByte.length));
+                realData.write(tmpByte);
+//                System.out.println(tmpByte.length+","+realData.toByteArray().length);
+            }catch (IOException e){
+
+            }
+        }
+        try{
+            byte []realBytes = realData.toByteArray();
+            baos.write(realBytes);
+//            System.out.println(realBytes.length + "," + baos.toByteArray().length);
+            return baos.toByteArray();
+        }catch (IOException e){
+            //
+        }
+
+        return null;
+    }
+
+    //总长度 + KeyLen + Key + ValueLen + Value + ...
+    public static void unserializeKeyValue(KeyValue kv, byte[] bytes){
+        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+        //type
+        int index = 0;
+        while(index < bytes.length){
+            try{
+                byte []tmpBytes = new byte[4];
+                //key
+                bais.read(tmpBytes);
+                int keyLen = SerializeUtil.byteToInt(tmpBytes);
+                byte []keyBytes = new byte[keyLen];
+                bais.read(keyBytes);
+                String key = new String(keyBytes);
+//                System.out.println("Key:"+key);
+                //val
+                bais.read(tmpBytes);
+                int valLen = SerializeUtil.byteToInt(tmpBytes);
+                byte []valBytes = new byte[valLen];
+                bais.read(valBytes);
+                ByteArrayInputStream tmpBais = new ByteArrayInputStream(valBytes);
+                ObjectInputStream ois = new ObjectInputStream(tmpBais);
+                Object valObj = ois.readObject();
+
+//                System.out.println("Val:"+valObj.toString());
+                kv.put(key, valObj);
+                index += 4+keyLen+4+valLen;
+            }catch (Exception e){
+
+            }
+        }
+
+    }
+
+    public static byte[]serializeMessageFull(Message msg){
+        DefaultBytesMessage message = (DefaultBytesMessage)msg;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        //headers
+        KeyValue headers = message.headers();
+        byte[] headersBytes = serializeKeyValue(headers);
+        KeyValue properies = message.properties();
+        byte[] properiesBytes = serializeKeyValue(properies);
+        byte[] body = message.getBody();
+
+        try{
+            baos.write(intToByte(headersBytes.length));
+            baos.write(headersBytes);
+
+            baos.write(intToByte(properiesBytes.length));
+            baos.write(properiesBytes);
+
+            baos.write(intToByte(body.length));
+            baos.write(body);
+        }catch (IOException e){
+            //
+        }
+        return baos.toByteArray();
+    }
+
+
+    public static Object unserializeMessageFull(byte[] bytes) {
+        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+        KeyValue headers = new DefaultKeyValue();
+        KeyValue properies = new DefaultKeyValue();
+        byte [] body = null;
+        try{
+            //headerLen
+            byte []tmpBytes = new byte[4];
+            bais.read(tmpBytes);
+            int headerLen = SerializeUtil.byteToInt(tmpBytes);
+            if (headerLen>0){
+                byte[] headersByte = new byte[headerLen];
+                bais.read(headersByte);
+                unserializeKeyValue(headers, headersByte);
+//                System.out.println(headers.getString("Queue"));
+            }
+            //properies
+            bais.read(tmpBytes);
+            int properiesLen = SerializeUtil.byteToInt(tmpBytes);
+            if(properiesLen > 0){
+                byte [] properiesByte = new byte[properiesLen];
+                bais.read(properiesByte);
+                unserializeKeyValue(properies, properiesByte);
+//                System.out.println(properies.getObject("test"));
+            }
+
+            bais.read(tmpBytes);
+            int bodyLen = SerializeUtil.byteToInt(tmpBytes);
+            body = new byte[bodyLen];
+            bais.read(body);
+        }catch (Exception e){
+            //
+        }
+
+        DefaultBytesMessage msg = new DefaultBytesMessage(body);
+
+        for (String key: headers.keySet()){
+            Object obj = headers.getObject(key);
+            msg.headers().put(key, obj);
+        }
+        for(String key: properies.keySet()){
+            Object obj = properies.getObject(key);
+            msg.properties().put(key, obj);
+        }
+        return msg;
+    }
 
     public static int byteToInt(byte[] bytes){
         return bytes[3] & 0xff | (bytes[2] & 0xff) << 8 | (bytes[1] & 0xff) << 16 | (bytes[0] & 0xff) << 24;
@@ -112,25 +267,32 @@ public class SerializeUtil {
         return defaultBytesMessage;
     }
 
+
+
     public static void main(String[]args){
         KeyValue properties = new DefaultKeyValue();
         properties.put("STORE_PATH", "/Users/KDF5000/Documents/2017/Coding/Middleware/data");
 
         Producer producer = new DefaultProducer(properties);
         Message msg = producer.createBytesMessageToQueue("QUEUE_1", "topic121".getBytes());
+        msg.putProperties("test", "12");
 
 //        byte []objs = SerializeUtil.serialize(msg);
         try{
             byte []objs = SerializeUtil.serializeMessage(msg);
+            byte []objs2 = SerializeUtil.serializeMessageFull(msg);
+            byte []objs3 = SerializeUtil.serialize(msg);
 
-            DefaultBytesMessage msg2 = (DefaultBytesMessage)SerializeUtil.unserializeMessage(objs);
-            System.out.println(objs.length);//329
+            System.out.println(objs.length+","+objs2.length + ","+ objs3.length );
+
+            DefaultBytesMessage msg2 = (DefaultBytesMessage)SerializeUtil.unserializeMessageFull(objs2);
             System.out.println(msg2.headers().getString(MessageHeader.QUEUE));
+            System.out.println(msg.properties().getString("test"));
             System.out.println(msg2.getBody().length);
+//
         }catch (Exception e){
             e.printStackTrace();
         }
-//        DefaultBytesMessage msg2 = (DefaultBytesMessage)SerializeUtil.unserialize(objs);
 
     }
 }

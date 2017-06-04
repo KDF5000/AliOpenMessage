@@ -9,7 +9,7 @@ import java.io.Serializable;
 public class DefaultBytesMessage implements BytesMessage,Serializable{
 
     private KeyValue headers = new DefaultKeyValue();
-    private KeyValue properties;
+    private KeyValue properties = new DefaultKeyValue();
     private byte[] body;
 
     public DefaultBytesMessage(byte[] body) {

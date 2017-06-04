@@ -53,6 +53,17 @@ public class DefaultKeyValue implements KeyValue {
     }
 
     @Override
+    public Object getObject(String key) {
+        return kvs.getOrDefault(key, null);
+    }
+
+    @Override
+    public KeyValue put(String key, Object obj) {
+        this.kvs.put(key, obj);
+        return this;
+    }
+
+    @Override
     public Set<String> keySet() {
         return kvs.keySet();
     }

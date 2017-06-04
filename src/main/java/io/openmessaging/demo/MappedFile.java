@@ -97,7 +97,8 @@ public class MappedFile {
 
     public void putMessage(Message msg) throws IOException{
 //        byte[] msgBytes = SerializeUtil.serialize(msg);
-        byte[] msgBytes = SerializeUtil.serializeMessage(msg);
+//        byte[] msgBytes = SerializeUtil.serializeMessage(msg);
+        byte[] msgBytes = SerializeUtil.serializeMessageFull(msg);
         int msgLen = msgBytes.length;
 //        if(msgLen>400){
 //            System.out.println("[KDF5000] Len:"+msgLen);
@@ -186,7 +187,8 @@ public class MappedFile {
 //            System.out.println(Integer.toHexString(data[j-1]));
         }
 //        Message msg = (Message) SerializeUtil.unserialize(data);
-        Message msg = (Message)SerializeUtil.unserializeMessage(data);
+//        Message msg = (Message)SerializeUtil.unserializeMessage(data);
+        Message msg = (Message)SerializeUtil.unserializeMessageFull(data);
         if(msg != null){
             return msg;
         }

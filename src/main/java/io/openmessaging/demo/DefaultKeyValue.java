@@ -10,7 +10,6 @@ import java.util.Set;
 public class DefaultKeyValue implements KeyValue,Serializable {
 
     private final Map<String, Object> kvs = new HashMap<>();
-    Object obj = new Object();
     @Override
     public KeyValue put(String key, int value) {
         kvs.put(key, value);
@@ -53,6 +52,15 @@ public class DefaultKeyValue implements KeyValue,Serializable {
     @Override
     public String getString(String key) {
         return (String)kvs.getOrDefault(key, null);
+    }
+
+    @Override
+    public Object getObject(String key) { return kvs.getOrDefault(key, null); }
+
+    @Override
+    public KeyValue put(String key, Object obj) {
+        kvs.put(key, obj);
+        return this;
     }
 
     @Override

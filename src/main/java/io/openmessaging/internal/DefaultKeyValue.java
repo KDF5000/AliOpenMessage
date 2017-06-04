@@ -68,6 +68,16 @@ public class DefaultKeyValue implements KeyValue {
     }
 
     @Override
+    public Object getObject(String key) {
+        return null;
+    }
+
+    @Override
+    public KeyValue put(String key, Object obj) {
+        return null;
+    }
+
+    @Override
     public Set<String> keySet() {
         return null;
     }
