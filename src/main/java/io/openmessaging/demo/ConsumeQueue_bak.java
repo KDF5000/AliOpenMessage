@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Created by KDF5000 on 2017/5/29.
  */
-public class ConsumeQueue {
+public class ConsumeQueue_bak {
     private List<String> bucketList;
     private int lastIndex; //当前从队列中获取的条数
     private String queueName; //队列名字
@@ -20,32 +20,12 @@ public class ConsumeQueue {
     private  KeyValue properties;
     private HashMap<String, Long> offsetMap = new HashMap<String, Long>();
     private String storePath;
-    //
-    private HashMap<String, MappedFile> mmapFileMap = new HashMap<String,MappedFile>();
 
-    public ConsumeQueue(String quene, List<String> buckets, KeyValue properties){
+    public ConsumeQueue_bak(String quene, List<String> buckets, KeyValue properties){
         this.properties = properties;
         this.queueName = quene;
         this.bucketList = buckets;
         this.storePath = properties.getString("STORE_PATH");
-    }
-
-    public  Message pullMessage(String bucket,int type, long offset,String storePath){
-        MappedFile mmapFile = null;
-        if(mmapFileMap.containsKey(type+bucket)){
-            mmapFile = mmapFileMap.get(type+bucket);
-        }else{
-            mmapFile = new MappedFile(storePath,bucket,type);
-            mmapFileMap.put(type+bucket,mmapFile);
-        }
-        try{
-//            System.out.println("MmapFileOffset:"+offset);
-            Message msg = mmapFile.getMessage(offset);
-            return msg;
-        }catch (Exception e){
-//            e.printStackTrace();
-        }
-        return null;
     }
 
     public Message pollMessage(){
@@ -63,7 +43,7 @@ public class ConsumeQueue {
                 offset = offsetMap.get(bucket);
             }
 //            System.out.println("Bucket:"+bucket+", Offset:"+offset);
-            Message message = pullMessage(bucket,type,offset,this.storePath);
+            Message message = messageStore.pullMessage(bucket,type,offset,this.storePath);
             if (message != null) {
                 offsetMap.put(bucket,++offset);
                 return message;
@@ -77,7 +57,7 @@ public class ConsumeQueue {
         topics.add("TOPIC1");
         KeyValue properties = new DefaultKeyValue();
         properties.put("STORE_PATH", "/Users/KDF5000/Documents/2017/Coding/Middleware/data");
-        ConsumeQueue queue = new ConsumeQueue("QUEUE1",topics,properties);
+        ConsumeQueue_bak queue = new ConsumeQueue_bak("QUEUE1",topics,properties);
         DefaultBytesMessage msg = (DefaultBytesMessage)queue.pollMessage();
         System.out.println("Header: "+ msg.headers().getString(MessageHeader.TOPIC) + "Body: "+new String(msg.getBody()));
     }

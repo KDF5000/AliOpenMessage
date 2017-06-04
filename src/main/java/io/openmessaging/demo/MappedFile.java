@@ -67,17 +67,17 @@ public class MappedFile {
         });
     }
 
-    private void unmap(MappedByteBuffer buffer) {
-        try{
-            Method m = FileChannelImpl.class.getDeclaredMethod("unmap",
-                    MappedByteBuffer.class);
-            m.setAccessible(true);
-            m.invoke(FileChannelImpl.class, buffer);
-
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
+//    private void unmap(MappedByteBuffer buffer) {
+//        try{
+//            Method m = FileChannelImpl.class.getDeclaredMethod("unmap",
+//                    MappedByteBuffer.class);
+//            m.setAccessible(true);
+//            m.invoke(FileChannelImpl.class, buffer);
+//
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
+//    }
 
     private void initMappedFile() throws FileNotFoundException,IOException{
         File indexFile = new File(indexFilePath);

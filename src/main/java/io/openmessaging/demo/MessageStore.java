@@ -30,7 +30,7 @@ class MessageFlush implements Runnable{
             int count = 0;
             while(true){
                 if (queue.size() == 0 && producerCounter.intValue() == 0){
-                    System.out.println("[KDF5000] Flush finished!");
+//                    System.out.println("[KDF5000] Flush finished!");
                     break;
                 }
 //              Message message = queue.poll(1, TimeUnit.SECONDS);
@@ -137,7 +137,7 @@ public class MessageStore {
         for(int i=0;i<QUEUE_NUM;i++){
             ts[i].join();
         }
-        System.out.println("[KDF5000] All flush threads finished!");
+//        System.out.println("[KDF5000] All flush threads finished!");
         synchronized (this){
             isFlushing = false;
         }
