@@ -63,9 +63,9 @@ class MessageFlush implements Runnable{
                     e.printStackTrace();
                 }
                 count++;
-//                if(count%200000==0){
-//                    System.out.println("[KDF5000] count:"+count);
-//                }
+                if(count%1000000==0){
+                    System.out.println("[KDF5000] count:"+count);
+                }
             }
         }catch (InterruptedException e){
             e.printStackTrace();
@@ -73,10 +73,9 @@ class MessageFlush implements Runnable{
     }
 }
 
-
 public class MessageStore {
     private static int MESSAGE_QUEUE_LEN = 200000;
-    private static int QUEUE_NUM = 15; //2000w
+    private static int QUEUE_NUM = 20; //2000w
     private static final MessageStore INSTANCE = new MessageStore();
     Thread[] ts = new Thread[QUEUE_NUM];
 
@@ -96,6 +95,9 @@ public class MessageStore {
     private ArrayBlockingQueue<Message>[] queues = new ArrayBlockingQueue[QUEUE_NUM];
 
     private HashMap<String, MappedFile> mmapFileMap = new HashMap<String,MappedFile>();
+
+    private ConcurrentHashMap<String, Integer> topicToQueue = new ConcurrentHashMap<String, Integer>();
+    private int nextQueueIndex = 0;
 
     private boolean isFlushing = false;
     private int pubMessageCount;
@@ -151,16 +153,16 @@ public class MessageStore {
     }
     //synchronized
     public void putMessage(String bucket, Message message) {
-//        if (!messageBuckets.containsKey(bucket)) {
-//            messageBuckets.put(bucket, new ArrayList<>(1024));
-//        }
-//        ArrayList<Message> bucketList = messageBuckets.get(bucket);
-//        bucketList.add(message);
-        //放入队列，等待异步落盘
-
         try{
 //            queue.put(message);
-            queues[Math.abs(bucket.hashCode())%QUEUE_NUM].put(message);
+            if(topicToQueue.containsKey(bucket)){
+                queues[topicToQueue.get(bucket)].put(message);
+            }else{
+                topicToQueue.put(bucket, nextQueueIndex);
+                queues[nextQueueIndex].put(message);
+                nextQueueIndex = (nextQueueIndex+1)%QUEUE_NUM;
+            }
+//            queues[Math.abs(bucket.hashCode())%QUEUE_NUM].put(message);
 //            System.out.println("[KDF5000]Put message " + ++pubMessageCount);
 //            System.out.println(Math.abs(bucket.hashCode())%QUEUE_NUM + ","+queues[Math.abs(bucket.hashCode())%QUEUE_NUM].size());
         }catch (InterruptedException e){
