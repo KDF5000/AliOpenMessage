@@ -307,18 +307,25 @@ public class SerializeUtil {
         Producer producer = new DefaultProducer(properties);
         Message msg = producer.createBytesMessageToQueue("QUEUE_1", "topic121".getBytes());
         msg.putProperties("test", "12");
+        msg.putProperties("test1", 12131313);
+        msg.putProperties("test2", 12.3);
 
 //        byte []objs = SerializeUtil.serialize(msg);
         try{
             byte []objs = SerializeUtil.serializeMessage(msg);
+            System.out.println(System.currentTimeMillis());
             byte []objs2 = SerializeUtil.serializeMessageFull(msg);
+            System.out.println(System.currentTimeMillis());
             byte []objs3 = SerializeUtil.serialize(msg);
 
             System.out.println(objs.length+","+objs2.length + ","+ objs3.length );
-
+            System.out.println(System.currentTimeMillis());
             DefaultBytesMessage msg2 = (DefaultBytesMessage)SerializeUtil.unserializeMessageFull(objs2);
+            System.out.println(System.currentTimeMillis());
             System.out.println(msg2.headers().getString(MessageHeader.QUEUE));
             System.out.println(msg.properties().getString("test"));
+            System.out.println(msg.properties().getInt("test1"));
+            System.out.println(msg.properties().getDouble("test2"));
             System.out.println(msg2.getBody().length);
 //
         }catch (Exception e){
