@@ -110,10 +110,6 @@ public interface KeyValue {
      */
     String getString(String key);
 
-    //获取对象
-    Object getObject(String key);
-    KeyValue put(String key, Object obj);
-
     /**
      * Returns a {@link Set} view of the keys contained in this {@code KeyValue} object.
      * The set is independent of this {@code KeyValue} object, like a copy, so changes to the set are

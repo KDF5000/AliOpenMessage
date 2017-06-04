@@ -6,11 +6,8 @@ import io.openmessaging.Message;
 import io.openmessaging.MessageHeader;
 import io.openmessaging.Producer;
 import io.openmessaging.PullConsumer;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
@@ -119,6 +116,12 @@ public class ConsumerTester {
         PropertyConfigurator.configure("log4j.properties");
         Thread[] ts = new Thread[Constants.CON_NUM];
         for (int i = 0; i < ts.length; i++) {
+//            List<String> list = new ArrayList<String>();
+//            list.add(Constants.TOPIC_PRE + i);
+//            int topic2 = i + 1;
+//            list.add(Constants.TOPIC_PRE + topic2);
+//
+//            ts[i] = new ConsumerTask(Constants.QUEUE_PRE + i,list);
             ts[i] = new ConsumerTask(Constants.QUEUE_PRE + i,
                 Collections.singletonList(Constants.TOPIC_PRE + i));
         }

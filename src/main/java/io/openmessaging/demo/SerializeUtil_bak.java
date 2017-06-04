@@ -65,7 +65,7 @@ public class SerializeUtil_bak {
         return baos.toByteArray();
     }
     //总长度 + KeyLen + Key + ValueLen + Value + ...
-    public static byte[] serializeKeyValue(KeyValue kv){
+    public static byte[] serializeKeyValue(DefaultKeyValue kv){
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ByteArrayOutputStream realData = new ByteArrayOutputStream();
         if (kv==null){
@@ -109,7 +109,7 @@ public class SerializeUtil_bak {
     }
 
     //总长度 + KeyLen + Key + ValueLen + Value + ...
-    public static void unserializeKeyValue(KeyValue kv, byte[] bytes){
+    public static void unserializeKeyValue(DefaultKeyValue kv, byte[] bytes){
         ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
         //type
         int index = 0;
@@ -148,9 +148,9 @@ public class SerializeUtil_bak {
 
         //headers
         KeyValue headers = message.headers();
-        byte[] headersBytes = serializeKeyValue(headers);
+        byte[] headersBytes = serializeKeyValue((DefaultKeyValue) headers);
         KeyValue properies = message.properties();
-        byte[] properiesBytes = serializeKeyValue(properies);
+        byte[] properiesBytes = serializeKeyValue((DefaultKeyValue) properies);
         byte[] body = message.getBody();
 
         try{
@@ -182,7 +182,7 @@ public class SerializeUtil_bak {
             if (headerLen>0){
                 byte[] headersByte = new byte[headerLen];
                 bais.read(headersByte);
-                unserializeKeyValue(headers, headersByte);
+                unserializeKeyValue((DefaultKeyValue) headers, headersByte);
 //                System.out.println(headers.getString("Queue"));
             }
             //properies
@@ -191,7 +191,7 @@ public class SerializeUtil_bak {
             if(properiesLen > 0){
                 byte [] properiesByte = new byte[properiesLen];
                 bais.read(properiesByte);
-                unserializeKeyValue(properies, properiesByte);
+                unserializeKeyValue((DefaultKeyValue)properies, properiesByte);
 //                System.out.println(properies.getObject("test"));
             }
 
@@ -206,12 +206,12 @@ public class SerializeUtil_bak {
         DefaultBytesMessage msg = new DefaultBytesMessage(body);
 
         for (String key: headers.keySet()){
-            Object obj = headers.getObject(key);
-            msg.headers().put(key, obj);
+            Object obj = ((DefaultKeyValue) headers).getObject(key);
+            ((DefaultKeyValue) msg.headers()).put(key, obj);
         }
         for(String key: properies.keySet()){
-            Object obj = properies.getObject(key);
-            msg.properties().put(key, obj);
+            Object obj = ((DefaultKeyValue) properies).getObject(key);
+            ((DefaultKeyValue) msg.properties()).put(key, obj);
         }
         return msg;
     }

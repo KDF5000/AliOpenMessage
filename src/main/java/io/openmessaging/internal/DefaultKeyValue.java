@@ -67,12 +67,10 @@ public class DefaultKeyValue implements KeyValue {
         return null;
     }
 
-    @Override
     public Object getObject(String key) {
         return null;
     }
 
-    @Override
     public KeyValue put(String key, Object obj) {
         return null;
     }

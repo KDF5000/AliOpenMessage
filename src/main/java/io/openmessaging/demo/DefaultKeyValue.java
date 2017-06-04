@@ -54,10 +54,8 @@ public class DefaultKeyValue implements KeyValue,Serializable {
         return (String)kvs.getOrDefault(key, null);
     }
 
-    @Override
     public Object getObject(String key) { return kvs.getOrDefault(key, null); }
 
-    @Override
     public KeyValue put(String key, Object obj) {
         kvs.put(key, obj);
         return this;
